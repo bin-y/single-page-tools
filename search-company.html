@@ -1,0 +1,269 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="Bin.Y">
+
+    <title>Search Company</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- Custom styles for this template -->
+    <style type="text/css">
+      /* Move down content because we have a fixed navbar that is 50px tall */
+      body {
+        margin-top: 20px;
+        padding-top: 50px;
+        padding-bottom: 20px;
+      }
+
+      #company-name {
+        width: 490px;
+      }
+
+      .engine-group-panel a span {
+        font-size: 12px;
+      }
+
+      .engine-group-panel .list-group-item {
+        cursor: pointer;
+      }
+
+      .engine-group-panel .list-group-item.active {
+        background-image: none;
+        text-shadow: none;
+        background-color: #d9edf7;
+        border-color: #bce8f1;
+        color: #31708f;
+      }
+
+      input[type="checkbox"] {
+        vertical-align: text-bottom;
+      };
+    </style>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://davidstutz.github.io/bootstrap-multiselect/dist/css/bootstrap-multiselect.css" type="text/css">
+    <script type="text/javascript" src="https://davidstutz.github.io/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
+  </head>
+
+
+
+  <body role="document">
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+          </button>
+          <p class="navbar-brand" href="#">Search Company</p>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <form class="navbar-form navbar-right">
+              <input type="text" class="form-control" id="company-name" placeholder="Company name"/>
+              <div class="btn-group">
+                <select id="engine-selector" multiple="multiple"></select>
+                <input id="btn-search" type="button" class="btn btn-default" value="Check it out!"/>
+              </div>
+              
+            </form>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container" id="main">
+      <div class="row" id="enginepanelContainer">
+      </div> 
+    </div>
+    
+    <script type="text/javascript">
+      var defaultEngines = ['location', 'ratings'];
+      var maxColumn = 4;
+      var searchEngineCount = 3;
+      var searchEngines = {
+        location: {
+          name: 'Location',
+          default: ['bing'],
+          items: {
+            bing: {name: 'Bing', url: 'https://www.bing.com/ditu/?q='},
+            baidu: {name: 'Baidu', url: 'http://map.baidu.com/?q='}
+          }
+        },
+        ratings: {
+          name: 'Ratings',
+          default: ['kanzhunBeijing'],
+          items: {
+            kanzhun: {name: 'KanZhun', url: 'http://www.kanzhun.com/companyl/search/?q='},
+            kanzhunBeijing: {name: 'KanZhun(Beijing)', url: 'http://www.kanzhun.com/pla7p1.html?q='},
+            wealink: {name: 'RuoLin', url: 'http://www.wealink.com/gongsi/?kw='},
+            wealinkBeijing: {name: 'RuoLin(Beijing)', url: 'http://www.wealink.com/gongsi/beijing_s/?kw='},
+            jobui: {name: 'ZhiYouJi', url: 'http://www.jobui.com/cmp?area=%E5%85%A8%E5%9B%BD&keyword='},
+            jobuiBeijing: {name: 'ZhiYouJi(Beijing)', url: 'http://www.jobui.com/cmp?area=%E5%8C%97%E4%BA%AC&keyword='}
+          }
+        },
+        direct: {
+          name: 'Direct Search',
+          default: [],
+          items: {
+            google: {name: 'Google', url: 'https://www.google.com/search?q='},
+            bing: {name: 'Bing', url: 'https://www.bing.com/ditu/?q='},
+            baidu: {name: 'Baidu', url: 'http://www.baidu.com/s?wd='}
+          }
+        }
+      };
+
+      $('#btn-search').on('click', function () {
+          var companyName = $('#company-name')[0].value;
+
+          $('#engine-selector option:selected').each(function() {
+            var engineGroupPanelSelector = '#engine-group-panel-' + $(this).val();
+            $(engineGroupPanelSelector + ' ' + '.badge')[0].click();
+          });
+        });
+
+      $('#engine-selector').ready(function() {
+          $('#engine-selector').multiselect({selectedClass: 'btn-group'});
+          var options = [];
+          for (var engineGroup in searchEngines) {
+            var option = {
+              label: searchEngines[engineGroup].name,
+              title: searchEngines[engineGroup].name,
+              value: engineGroup
+            };
+            if ($.inArray(engineGroup, defaultEngines) != -1)
+              option.selected = true;
+            options.push(option);
+          };
+          
+          $('#engine-selector').multiselect('dataprovider', options);
+        });
+
+      $('#company-name').on('keydown', function(event) {
+          if(event.keyCode == 13) {
+            $('#btn-search')[0].click();
+          };
+        });
+
+      function EngineGroupPanel(engineGroup)
+      {
+        this.$panel = $('<div class="panel engine-group-panel"></div>');
+        this.$panelHeading = $('<div class="panel-heading"></div>');
+        this.$panelTitle = $('<h3 class="panel-title"></h3>');
+        this.$counterBadge = $('<span class="btn badge">0</span>');
+        this.$panelBody = $();
+        this.onEngineItemChange = $.proxy(this.onEngineItemChange, this);
+        this.onCounterBadgeClick = $.proxy(this.onCounterBadgeClick, this);
+
+        this.$panel.addClass('panel-primary');
+        this.$panelTitle.text(engineGroup.name);
+
+        this.$counterBadge.css('float', 'right');
+        this.$counterBadge.on('click', this.onCounterBadgeClick);
+
+        for (var item in engineGroup.items) {
+          var $line = $('<a class="list-group-item"></a>');
+          var $checkbox = $('<input type="checkbox"></input>');
+          var $span = $('<span></span>');
+
+          $checkbox.on('change', this.onEngineItemChange);
+
+          if ($.inArray(item, engineGroup.default) != -1)
+            $checkbox[0].checked = true;
+
+          $line.attr('searchurl', engineGroup.items[item].url);
+          $checkbox.attr('searchurl', engineGroup.items[item].url);
+          $span.attr('searchurl', engineGroup.items[item].url);
+          $line.on('click', this.onEngineItemClick);
+          $span.text(engineGroup.items[item].name);
+
+          $line.append($checkbox, $span);
+
+
+          this.$panelBody = this.$panelBody.add($line);
+        }
+
+        this.onEngineItemChange();
+
+        this.$panelTitle.append(this.$counterBadge);
+        this.$panelHeading.append(this.$panelTitle);
+        this.$panel.append(this.$panelHeading);
+        this.$panel.append(this.$panelBody);
+        console.log(this);
+
+        return this;
+      }
+
+      EngineGroupPanel.prototype = {
+        onEngineItemChange: function(){
+          var selectCount = 0;
+          this.$panelBody.children('input[type="checkbox"]').each(
+            function(index, element){
+              if(element.checked)
+              {
+                selectCount++;
+                $(element.parentNode).addClass('active');
+              }
+              else
+              {
+                $(element.parentNode).removeClass('active');
+              }
+            });
+          this.$counterBadge.text(selectCount);
+        },
+        onEngineItemClick: function(event){
+          if(event.target.tagName == 'INPUT')
+            return;
+          var companyName = $('#company-name')[0].value;
+          window.open(event.target.attributes.searchurl.value + companyName);
+        },
+        onCounterBadgeClick: function(){
+          var companyName = $('#company-name')[0].value;
+          this.$panelBody.children('input[type="checkbox"]').each(
+            function(index, element){
+              if(element.checked)
+                window.open(element.attributes.searchurl.value + companyName);
+            });
+        }
+      }
+
+      $('#enginepanelContainer').ready(function() {
+          var colCount = 1;
+
+          if (searchEngineCount >= maxColumn) colCount = maxColumn;
+          else colCount = searchEngineCount;
+          var cols = $();
+          for (var i = colCount - 1; i >= 0; i--) {
+            cols = cols.add('<div></div>');
+          };
+          cols.addClass('col-lg-' + (12 / colCount));
+
+          var currentCol = 0;
+          for (var engineGroup in searchEngines) {
+            var enginePanel = new EngineGroupPanel(searchEngines[engineGroup]);
+            enginePanel.$panel[0].id = 'engine-group-panel-' + engineGroup;
+            $(cols[currentCol]).append(enginePanel.$panel);
+
+
+            currentCol ++;
+            if(currentCol == maxColumn)
+              currentCol = 0;
+          };
+          $('#enginepanelContainer').append(cols);
+        });
+
+        
+    </script>
+    
+  </body>
+</html>
