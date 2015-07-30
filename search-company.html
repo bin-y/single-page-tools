@@ -221,15 +221,15 @@
           if(event.target.tagName == 'INPUT')
             return;
           var companyName = $('#company-name')[0].value;
+          if(companyName == '')
+            return;
           window.open(event.target.attributes.searchurl.value + companyName);
         },
         onCounterBadgeClick: function(){
-          var companyName = $('#company-name')[0].value;
-          this.$panelBody.children('input[type="checkbox"]').each(
-            function(index, element){
-              if(element.checked)
-                window.open(element.attributes.searchurl.value + companyName);
-            });
+            this.$panel.children('.list-group-item.active').each(
+              function(index, element){
+                element.click();
+          });
         }
       }
 
