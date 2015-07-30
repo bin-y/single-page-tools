@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="">
+    <meta name="description" content="This webpage help me search the information about the companies easier.">
     <meta name="author" content="Bin.Y">
 
     <title>Search Company</title>
@@ -22,6 +22,12 @@
 
       #company-name {
         width: 490px;
+      }
+
+      .empty-name-hint {
+        border: 3px solid #b00;
+        padding: 4px 10px;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 10px rgba(192, 20, 20, 0.75);
       }
 
       .engine-group-panel a span {
@@ -123,9 +129,11 @@
       };
 
       $('#btn-search').on('click', function () {
-          $('#engine-selector option:selected').each(function() {
+          $('#engine-selector option:selected').each(function() {   
+            if(!checkCompanyName())
+              return;
             var engineGroupPanelSelector = '#engine-group-panel-' + $(this).val();
-            $(engineGroupPanelSelector + ' ' + '.badge')[0].click();
+            $(engineGroupPanelSelector + ' .badge')[0].click();
           });
         });
 
@@ -145,6 +153,42 @@
           
           $('#engine-selector').multiselect('dataprovider', options);
         });
+
+      function checkCompanyName() {
+        var companyName = $('#company-name')[0].value;
+        if(companyName != '')
+          return true;
+
+        var emptyNameHint = function () {
+          var config = {
+            repeat: 2,
+            counter: 0,
+            hintTime: 250,
+            hintInterval: 200,
+            hintClassName: 'empty-name-hint',
+            hintSelector: '#company-name',
+            hint,
+            cancelHint,
+          };
+          var hint = function () {
+            this.counter++;
+            $(this.hintSelector).addClass(this.hintClassName);
+            setTimeout(this.cancelHint, this.hintTime);
+          };
+          var cancelHint = function () {
+            $(this.hintSelector).removeClass(this.hintClassName);
+            if (this.counter < this.repeat) {
+              setTimeout(this.hint, this.hintInterval);
+            };
+          };
+          config.hint = $.proxy(hint, config);
+          config.cancelHint = $.proxy(cancelHint, config);
+          config.hint();
+        }
+
+        emptyNameHint();
+        return false;
+      }
 
       $('#company-name').on('keydown', function(event) {
           if(event.keyCode == 13) {
@@ -195,7 +239,6 @@
         this.$panelHeading.append(this.$panelTitle);
         this.$panel.append(this.$panelHeading);
         this.$panel.append(this.$panelBody);
-        console.log(this);
 
         return this;
       }
@@ -220,16 +263,22 @@
         onEngineItemClick: function(event){
           if(event.target.tagName == 'INPUT')
             return;
+          if(!checkCompanyName())
+            return;
+
           var companyName = $('#company-name')[0].value;
           if(companyName == '')
             return;
           window.open(event.target.attributes.searchurl.value + companyName);
         },
         onCounterBadgeClick: function(){
+            if(!checkCompanyName())
+              return;
+
             this.$panel.children('.list-group-item.active').each(
               function(index, element){
                 element.click();
-          });
+            });
         }
       }
 
