@@ -123,8 +123,6 @@
       };
 
       $('#btn-search').on('click', function () {
-          var companyName = $('#company-name')[0].value;
-
           $('#engine-selector option:selected').each(function() {
             var engineGroupPanelSelector = '#engine-group-panel-' + $(this).val();
             $(engineGroupPanelSelector + ' ' + '.badge')[0].click();
@@ -154,8 +152,7 @@
           };
         });
 
-      function EngineGroupPanel(engineGroup)
-      {
+      function EngineGroupPanel(engineGroup) {
         this.$panel = $('<div class="panel engine-group-panel"></div>');
         this.$panelHeading = $('<div class="panel-heading"></div>');
         this.$panelTitle = $('<h3 class="panel-title"></h3>');
@@ -263,6 +260,5 @@
 
         
     </script>
-    
   </body>
 </html>
