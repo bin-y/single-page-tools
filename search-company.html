@@ -129,7 +129,7 @@
       };
 
       $('#btn-search').on('click', function () {
-          $('#engine-selector option:selected').each(function() {   
+          $('#engine-selector option:selected').each(function() {
             if(!checkCompanyName())
               return;
             var engineGroupPanelSelector = '#engine-group-panel-' + $(this).val();
